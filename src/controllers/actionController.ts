@@ -38,6 +38,12 @@ const listActions = async (req: ReqAction, res: Response) => {
     const actions = await Connection.findOne({ user_id: req.user_tkn?.user._id }).sort({
       createdAt: 'descending',
     });
+
+    if (!actions) {
+      req.body.data = [];
+      return registerAction(req, res);
+    }
+
     return res.status(200).json(actions);
   } catch (error) {
     return res.status(500).json({ msg: 'Ocorreu um erro inesperado', error });
