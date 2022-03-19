@@ -22,7 +22,7 @@ export const hindsightDoesNotExist = async ({ id, user_id }: ItDoesNotExist) => 
   if (!user) {
     throw {
       status: 401,
-      errorBusiness: 'Retroespectiva informada não existe',
+      errorBusiness: 'Retrospectiva informada não existe',
     };
   }
 
