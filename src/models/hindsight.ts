@@ -8,18 +8,23 @@ interface IStepOne {
 
 interface IStepTwo extends IStepOne {}
 
-interface IHindsight {
-  _id: string;
+interface IStepThree {
+  employee: Schema.Types.ObjectId;
+  votes: Number;
+}
+
+export interface IHindsight {
+  _id?: string;
 
   name: string;
   stepOne: IStepOne[];
   stepTwo: IStepTwo[];
-  employee_id?: Schema.Types.ObjectId;
-  user_id: Schema.Types.ObjectId;
-
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
+  stepThree: IStepThree[];
+  winningEmployee?: Schema.Types.ObjectId;
+  user_id: Schema.Types.ObjectId | string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 const HindsightSchema = new Schema<IHindsight>(
@@ -27,7 +32,16 @@ const HindsightSchema = new Schema<IHindsight>(
     name: String,
     stepOne: [{ employeeName: String, description: String, votes: Number }],
     stepTwo: [{ employeeName: String, description: String, votes: Number }],
-    employee_id: {
+    stepThree: [
+      {
+        employee: {
+          type: Schema.Types.ObjectId,
+          ref: 'employees',
+        },
+        votes: Number,
+      },
+    ],
+    winningEmployee: {
       type: Schema.Types.ObjectId,
       ref: 'employees',
     },

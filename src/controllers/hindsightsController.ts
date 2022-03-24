@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import * as hindsightBusiness from '../business/hindsight.business';
 import Connection from '../models/hindsight';
 import { IUser } from '../models/user';
+import { IHindsight } from '../models/hindsight';
 
 interface ReqHindsight extends Request {
   user_tkn?: { user: IUser };
@@ -14,11 +15,12 @@ const registerHindsight = async (req: ReqHindsight, res: Response): Promise<any>
   try {
     await hindsightBusiness.hasEmptyFields(req.body, fields);
 
-    const payload = {
+    const payload: IHindsight = {
       name: req.body.name,
       stepOne: [],
       stepTwo: [],
-      user_id: req.user_tkn?.user._id,
+      stepThree: [],
+      user_id: req.user_tkn?.user._id!,
     };
 
     const newHindsight = await Connection.create(payload);
@@ -41,7 +43,8 @@ const listHindsights = async (req: ReqHindsight, res: Response) => {
       .sort({
         createdAt: 'descending',
       })
-      .populate('employee_id');
+      .populate('winningEmployee')
+      .populate('stepThree.employee');
     return res.status(200).json(hindsights.reverse());
   } catch (e) {
     return res.status(500).json({ msg: 'Ocorreu um erro inesperado' });
