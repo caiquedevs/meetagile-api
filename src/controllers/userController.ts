@@ -15,7 +15,7 @@ const KEYJWT = process.env.KEYJWT;
 const USER_EMAIL = process.env.USER_EMAIL;
 const USER_PASSWORD = process.env.USER_PASSWORD;
 
-const registerAction = async (req: { user_id: string }, res: Response): Promise<any> => {
+const registerAction = async (req: any, res: Response): Promise<any> => {
   try {
     const payload = {
       data: [],
@@ -63,10 +63,7 @@ const loginUser = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-const registerUser = async (
-  req: Request & { user_id: string },
-  res: Response
-): Promise<any> => {
+const registerUser = async (req: any, res: Response): Promise<any> => {
   const fields = ['teamName', 'email', 'password'];
 
   try {
