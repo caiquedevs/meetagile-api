@@ -14,46 +14,29 @@ interface ReqHindsight extends Request {
   user_tkn?: { user: IUser };
 }
 
-interface ReqAction extends Request {
-  user_tkn?: { user: IUser };
-}
-
-const registerAction = async (req: ReqAction, res: Response): Promise<any> => {
-  const fields = ['data'];
-
-  try {
-    await actionBusiness.hasEmptyFields(req.body, fields);
-
-    const payload = {
-      data: req.body.data,
-      user_id: req.user_tkn?.user._id,
-    };
-
-    const newAction = await ConnectionActions.create(payload);
-    return newAction;
-  } catch (error: any) {
-    if (error.errorBusiness) {
-      return res.status(error.status).json({ msg: error.errorBusiness });
-    }
-
-    return res.status(500).json({
-      msg: 'Ocorreu um erro inesperado',
-      error,
-    });
-  }
-};
-
 const registerHindsight = async (req: ReqHindsight, res: Response): Promise<any> => {
   const fields = ['name'];
 
   try {
     await hindsightBusiness.hasEmptyFields(req.body, fields);
 
+    const employees = await ConnectionEmployee.find({
+      user_id: req.user_tkn?.user._id,
+    }).sort({
+      createdAt: 'descending',
+    });
+
+    const stepThree = employees.map((employee) => ({
+      employee: employee,
+      votedFor: undefined,
+      votes: 0,
+    }));
+
     const payload: IHindsight = {
       name: req.body.name,
       stepOne: [],
       stepTwo: [],
-      stepThree: [],
+      stepThree,
       user_id: req.user_tkn?.user._id!,
     };
 
@@ -74,9 +57,6 @@ const registerHindsight = async (req: ReqHindsight, res: Response): Promise<any>
 const listHindsights = async (req: ReqHindsight, res: Response) => {
   try {
     const hindsights = await Connection.find({ user_id: req.user_tkn?.user._id })
-      .sort({
-        createdAt: 'descending',
-      })
       .populate('winningEmployee')
       .populate('stepThree.employee');
 
@@ -91,11 +71,6 @@ const listHindsights = async (req: ReqHindsight, res: Response) => {
     }).sort({
       createdAt: 'descending',
     });
-
-    if (!actions) {
-      req.body.data = [];
-      actions = await registerAction(req, res);
-    }
 
     return res.status(200).json({ hindsights, employees, actions });
   } catch (e) {

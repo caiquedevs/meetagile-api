@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { IEmployee } from './employee';
 
 interface IStepOne {
   employeeName: string;
@@ -9,7 +10,8 @@ interface IStepOne {
 interface IStepTwo extends IStepOne {}
 
 interface IStepThree {
-  employee: Schema.Types.ObjectId;
+  employee: IEmployee;
+  votedFor?: Schema.Types.ObjectId;
   votes: Number;
 }
 
@@ -35,6 +37,10 @@ const HindsightSchema = new Schema<IHindsight>(
     stepThree: [
       {
         employee: {
+          type: Schema.Types.ObjectId,
+          ref: 'employees',
+        },
+        votedFor: {
           type: Schema.Types.ObjectId,
           ref: 'employees',
         },

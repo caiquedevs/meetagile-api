@@ -1,16 +1,40 @@
 import jwt from 'jsonwebtoken';
-import Connection from '../models/user';
 import * as dotenv from 'dotenv';
 import { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
 
+import * as actionBusiness from '../business/actions.business';
 import * as userBusiness from '../business/user.business';
+
+import Connection, { IUser } from '../models/user';
+import ConnectionActions from '../models/actions';
 
 dotenv.config();
 
 const KEYJWT = process.env.KEYJWT;
 const USER_EMAIL = process.env.USER_EMAIL;
 const USER_PASSWORD = process.env.USER_PASSWORD;
+
+const registerAction = async (req: { user_id: string }, res: Response): Promise<any> => {
+  try {
+    const payload = {
+      data: [],
+      user_id: req.user_id,
+    };
+
+    const newAction = await ConnectionActions.create(payload);
+    return newAction;
+  } catch (error: any) {
+    if (error.errorBusiness) {
+      return res.status(error.status).json({ msg: error.errorBusiness });
+    }
+
+    return res.status(500).json({
+      msg: 'Ocorreu um erro inesperado',
+      error,
+    });
+  }
+};
 
 const loginUser = async (req: Request, res: Response): Promise<any> => {
   const whiteList = ['email', 'password'];
@@ -39,7 +63,10 @@ const loginUser = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-const registerUser = async (req: Request, res: Response): Promise<any> => {
+const registerUser = async (
+  req: Request & { user_id: string },
+  res: Response
+): Promise<any> => {
   const fields = ['teamName', 'email', 'password'];
 
   try {
@@ -53,7 +80,11 @@ const registerUser = async (req: Request, res: Response): Promise<any> => {
       cpfCnpj: '',
     };
 
-    await Connection.create(payload);
+    const user = await Connection.create(payload);
+
+    req.user_id = user._id;
+    let actions = await registerAction(req, res);
+
     return loginUser(req, res);
   } catch (error: any) {
     if (error.errorBusiness) {
