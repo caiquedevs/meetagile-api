@@ -22,7 +22,7 @@ export interface IHindsight {
   stepOne: IStepOne[];
   stepTwo: IStepTwo[];
   stepThree: IStepThree[];
-  winningEmployee?: Schema.Types.ObjectId;
+  winningEmployee?: IEmployee;
   user_id: Schema.Types.ObjectId | string;
   createdAt?: string;
   updatedAt?: string;
@@ -36,20 +36,28 @@ const HindsightSchema = new Schema<IHindsight>(
     stepTwo: [{ employeeName: String, description: String, votes: Number }],
     stepThree: [
       {
-        employee: {
-          type: Schema.Types.ObjectId,
-          ref: 'employees',
-        },
+        _id: String,
+        user_id: Schema.Types.ObjectId,
+        name: String,
+        office: String,
+        url: String,
+
         votedFor: {
-          type: Schema.Types.ObjectId,
-          ref: 'employees',
+          _id: String,
+          user_id: Schema.Types.ObjectId,
+          name: String,
+          office: String,
+          url: String,
         },
         votes: Number,
       },
     ],
     winningEmployee: {
-      type: Schema.Types.ObjectId,
-      ref: 'employees',
+      _id: String,
+      user_id: Schema.Types.ObjectId,
+      name: String,
+      office: String,
+      url: String,
     },
     user_id: {
       type: Schema.Types.ObjectId,

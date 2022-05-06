@@ -20,23 +20,12 @@ const registerHindsight = async (req: ReqHindsight, res: Response): Promise<any>
   try {
     await hindsightBusiness.hasEmptyFields(req.body, fields);
 
-    const employees = await ConnectionEmployee.find({
-      user_id: req.user_tkn?.user._id,
-    }).sort({
-      createdAt: 'descending',
-    });
-
-    const stepThree = employees.map((employee) => ({
-      employee: employee,
-      votedFor: undefined,
-      votes: 0,
-    }));
-
     const payload: IHindsight = {
       name: req.body.name,
-      stepOne: [],
-      stepTwo: [],
-      stepThree,
+      stepOne: req.body.stepOne,
+      stepTwo: req.body.stepTwo,
+      stepThree: req.body.stepThree,
+      winningEmployee: req.body.winningEmployee,
       user_id: req.user_tkn?.user._id!,
     };
 
@@ -56,9 +45,9 @@ const registerHindsight = async (req: ReqHindsight, res: Response): Promise<any>
 
 const listHindsights = async (req: ReqHindsight, res: Response) => {
   try {
-    const hindsights = await Connection.find({ user_id: req.user_tkn?.user._id })
-      .populate('winningEmployee')
-      .populate('stepThree.employee');
+    const hindsights = await Connection.find({
+      user_id: req.user_tkn?.user._id,
+    });
 
     const employees = await ConnectionEmployee.find({
       user_id: req.user_tkn?.user._id,
