@@ -24,6 +24,7 @@ export interface IHindsight {
   stepThree: IStepThree[];
   winningEmployee?: IEmployee;
   user_id: Schema.Types.ObjectId | string;
+  timer: { hours: number; minutes: number; seconds: number };
   createdAt?: string;
   updatedAt?: string;
   __v?: number;
@@ -32,6 +33,7 @@ export interface IHindsight {
 const HindsightSchema = new Schema<IHindsight>(
   {
     name: String,
+    timer: { hours: Number, minutes: Number, seconds: Number },
     stepOne: [{ employeeName: String, description: String, votes: Number }],
     stepTwo: [{ employeeName: String, description: String, votes: Number }],
     stepThree: [

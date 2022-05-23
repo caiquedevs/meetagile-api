@@ -52,3 +52,14 @@ export const loginUser = async (email: string, password: string) => {
 
   return user;
 };
+
+export const verifyAdmin = async (id: string) => {
+  const user = await userDoesNotExist({ id });
+
+  if (user.type !== 'admin') {
+    throw {
+      status: 401,
+      errorBusiness: 'Acesso restrito apenas à ADMINISTRADORES!',
+    };
+  }
+};

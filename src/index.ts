@@ -8,8 +8,8 @@ const port = process.env.PORT || 3333;
 app
   .listen(port, () => {
     console.table({
-      develop: `http://localhost:${port}`,
-      prd: 'Pendente',
+      localhost: `http://localhost:${port}`,
+      production: 'https://meetagile-api-v2.herokuapp.com',
     });
   })
   .on('error', (e: any) => {

@@ -1,7 +1,7 @@
 import Connection from '../models/hindsight';
 
 interface ItDoesNotExist {
-  id?: string;
+  id: string;
   user_id: string;
 }
 
@@ -17,14 +17,14 @@ export const hasEmptyFields = async (obj: any, fields: string[]) => {
 };
 
 export const hindsightDoesNotExist = async ({ id, user_id }: ItDoesNotExist) => {
-  const user = await Connection.findOne().and([{ _id: id }, { user_id }]);
+  const hindsight = await Connection.findOne().and([{ _id: id }, { user_id }]);
 
-  if (!user) {
+  if (!hindsight) {
     throw {
       status: 401,
       errorBusiness: 'Retrospectiva informada não existe',
     };
   }
 
-  return user;
+  return hindsight;
 };

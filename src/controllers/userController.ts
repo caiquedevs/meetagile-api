@@ -3,11 +3,11 @@ import * as dotenv from 'dotenv';
 import { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
 
-import * as actionBusiness from '../business/actions.business';
 import * as userBusiness from '../business/user.business';
 
 import Connection, { IUser } from '../models/user';
-import ConnectionActions from '../models/actions';
+
+import { registerAction } from './actionController';
 
 dotenv.config();
 
@@ -15,26 +15,9 @@ const KEYJWT = process.env.KEYJWT;
 const USER_EMAIL = process.env.USER_EMAIL;
 const USER_PASSWORD = process.env.USER_PASSWORD;
 
-const registerAction = async (req: any, res: Response): Promise<any> => {
-  try {
-    const payload = {
-      data: [],
-      user_id: req.user_id,
-    };
-
-    const newAction = await ConnectionActions.create(payload);
-    return newAction;
-  } catch (error: any) {
-    if (error.errorBusiness) {
-      return res.status(error.status).json({ msg: error.errorBusiness });
-    }
-
-    return res.status(500).json({
-      msg: 'Ocorreu um erro inesperado',
-      error,
-    });
-  }
-};
+interface ReqUser extends Request {
+  user_tkn?: { user: IUser };
+}
 
 const loginUser = async (req: Request, res: Response): Promise<any> => {
   const whiteList = ['email', 'password'];
@@ -64,7 +47,7 @@ const loginUser = async (req: Request, res: Response): Promise<any> => {
 };
 
 const registerUser = async (req: any, res: Response): Promise<any> => {
-  const fields = ['teamName', 'email', 'password'];
+  const fields = ['email', 'password'];
 
   try {
     await userBusiness.hasEmptyFields(req.body, fields);
@@ -74,6 +57,7 @@ const registerUser = async (req: any, res: Response): Promise<any> => {
       teamName: req.body.teamName,
       email: req.body.email,
       password: req.body.password,
+      type: 'team',
       cpfCnpj: '',
     };
 
@@ -95,21 +79,12 @@ const registerUser = async (req: any, res: Response): Promise<any> => {
   }
 };
 
-const listUsers = async (req: Request, res: Response) => {
+const listUsersAdmin = async (req: ReqUser, res: Response) => {
   try {
+    await userBusiness.verifyAdmin(req.user_tkn?.user?._id!);
+
     const response = await Connection.find();
-    return res.status(200).json(response.reverse());
-  } catch (e) {
-    return res.status(500).json({ msg: 'Ocorreu um erro inesperado' });
-  }
-};
-
-const showUser = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.user_id;
-
-    const user = await userBusiness.userDoesNotExist({ id });
-    return res.status(200).json(user);
+    return res.status(200).json(response);
   } catch (error: any) {
     if (error.errorBusiness) {
       return res.status(error.status).json({ msg: error.errorBusiness });
@@ -143,8 +118,10 @@ const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-const deleteUser = async (req: Request, res: Response) => {
+const deleteUserAdmin = async (req: ReqUser, res: Response) => {
   try {
+    await userBusiness.verifyAdmin(req.user_tkn?.user?._id!);
+
     const id = req.params.user_id;
     const user = await userBusiness.userDoesNotExist({ id });
 
@@ -212,9 +189,8 @@ const forgotPassword = async (req: Request, res: Response) => {
 };
 
 export {
-  listUsers,
-  showUser,
-  deleteUser,
+  listUsersAdmin,
+  deleteUserAdmin,
   updateUser,
   registerUser,
   loginUser,

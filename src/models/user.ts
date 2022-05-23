@@ -4,6 +4,7 @@ export interface IUser {
   _id: string;
   teamName: string;
   email: string;
+  type?: 'team' | 'admin';
   password?: string;
   cpfCnpj: string;
   createdAt: string;
@@ -19,6 +20,7 @@ const UserSchema = new Schema<IUser>(
     cpfCnpj: String,
     createdAt: String,
     updatedAt: String,
+    type: String,
   },
   {
     timestamps: true,

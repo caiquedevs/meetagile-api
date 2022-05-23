@@ -3,18 +3,21 @@ import Auth from '../middlewares/Auth';
 
 import {
   listHindsights,
-  showHindsight,
   registerHindsight,
   updateHindsight,
   deleteHindsight,
+  listHindsightsAdmin,
+  listAllUserHindsightsAdmin,
 } from '../controllers/hindsightsController';
 
 const router = Router();
 
 router.get('/hindsights', Auth.verify, listHindsights);
-router.get('/hindsight/:hindsight_id', Auth.verify, showHindsight);
 router.post('/hindsight/register', Auth.verify, registerHindsight);
-router.put('/hindsight/:hindsight_id', Auth.verify, updateHindsight);
+router.put('/hindsight', Auth.verify, updateHindsight);
 router.delete('/hindsight/:hindsight_id', Auth.verify, deleteHindsight);
+
+router.get('/admin/hindsights', Auth.verify, listHindsightsAdmin);
+router.get('/admin/hindsights/user/:user_id', Auth.verify, listAllUserHindsightsAdmin);
 
 export default router;

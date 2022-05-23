@@ -47,27 +47,6 @@ const listEmployees = async (req: ReqRegister, res: Response) => {
   }
 };
 
-const showEmployee = async (req: ReqRegister, res: Response) => {
-  try {
-    const id = req.params.employee_id;
-
-    const employee = await employeeBusiness.employeeDoesNotExist({
-      id,
-      user_id: req.user_tkn?.user._id!,
-    });
-    return res.status(200).json(employee);
-  } catch (error: any) {
-    if (error.errorBusiness) {
-      return res.status(error.status).json({ msg: error.errorBusiness });
-    }
-
-    return res.status(500).json({
-      msg: 'Ocorreu um erro inesperado',
-      error,
-    });
-  }
-};
-
 const updateEmployee = async (req: ReqRegister, res: Response) => {
   const payload = { ...req.body };
 
@@ -112,4 +91,4 @@ const deleteEmployee = async (req: ReqRegister, res: Response) => {
   }
 };
 
-export { listEmployees, showEmployee, deleteEmployee, updateEmployee, registerEmployee };
+export { listEmployees, deleteEmployee, updateEmployee, registerEmployee };
